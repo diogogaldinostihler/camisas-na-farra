@@ -30,8 +30,7 @@ h2{font-size:1.5rem}
 .lede{color:var(--muted);margin:8px 0 0;max-width:60ch}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
 form{display:grid;gap:18px}
-.top{display:grid;grid-template-columns:1fr 160px;gap:20px;align-items:start}
-@media (max-width:540px){.top{grid-template-columns:1fr}.shirt{order:-1;justify-self:center}}
+.top{display:grid;gap:18px}
 .fields{display:grid;gap:18px;min-width:0}
 label,.lbl{display:block;font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px}
 input[type=text],input[type=number]{width:100%;font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
@@ -48,9 +47,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--hi);outline-off
 .jogos label b{font-family:var(--display);font-size:1.15rem;letter-spacing:.04em}
 .jogos input:checked+label{border-color:var(--fg);box-shadow:0 0 0 2px var(--hi)}
 .jogos input:focus-visible+label{outline:2px solid var(--hi);outline-offset:2px}
-.mini{width:44px;height:44px;border-radius:8px;border:1px solid rgba(0,0,0,.2);position:relative;overflow:hidden}
-.mini i{position:absolute;left:55%;top:0;bottom:0;width:7px}
-.mini u{position:absolute;left:0;right:0;top:30%;height:6px}
+.mini{width:100%;max-width:120px;aspect-ratio:3/4;object-fit:cover;object-position:top;border-radius:6px;display:block}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .row input[type=number]{max-width:110px}
 .hint{font-size:.85rem;color:var(--muted);margin:6px 0 0}
@@ -60,9 +57,8 @@ button{font:inherit;cursor:pointer;border-radius:8px}
 .ghost{background:transparent;border:1px solid var(--line);color:var(--fg);padding:8px 14px;font-size:.9rem}
 .msg{min-height:1.5em;font-weight:500;margin:0}
 .msg.err{color:var(--danger)}
-.shirt{margin:0}
-.shirt svg{width:160px;height:auto;display:block}
-.shirt figcaption{text-align:center;font-size:.8rem;color:var(--muted);margin-top:4px}
+.foto{margin:12px 0 0}
+.foto img{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line)}
 .head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}
 .count{font-family:var(--display);font-weight:600;font-size:1.1rem;color:var(--muted)}
 .live{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted)}
@@ -100,6 +96,7 @@ textarea{width:100%;min-height:140px;font:inherit;font-size:.85rem;margin-top:10
       <div>
         <span class="lbl">Camisa</span>
         <div class="jogos" id="jogos" role="radiogroup" aria-label="Camisa"></div>
+        <figure class="foto"><img id="foto" src="img/jg1.jpg" alt="Camisa JG1 Amarela, frente e costas" width="960" height="720"></figure>
       </div>
 
       <div class="top">
@@ -123,16 +120,6 @@ textarea{width:100%;min-height:140px;font:inherit;font-size:.85rem;margin-top:10
             </div>
           </div>
         </div>
-        <figure class="shirt">
-          <svg viewBox="0 0 120 120" aria-hidden="true">
-            <path id="s-body" d="M38 10 L22 16 L6 34 L20 46 L28 40 L28 112 L92 112 L92 40 L100 46 L114 34 L98 16 L82 10 C78 18 70 22 60 22 C50 22 42 18 38 10 Z" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/>
-            <path id="s-cuff-l" d="M6 34 L20 46 L23.5 42.5 L9.5 30.5 Z"/>
-            <path id="s-cuff-r" d="M114 34 L100 46 L96.5 42.5 L110.5 30.5 Z"/>
-            <text id="s-num" x="60" y="80" text-anchor="middle" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="800" font-size="44"></text>
-            <text id="s-name" x="60" y="100" text-anchor="middle" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="800" font-size="11">NOME</text>
-          </svg>
-          <figcaption>Costas da camisa</figcaption>
-        </figure>
       </div>
 
       <div>
@@ -217,10 +204,7 @@ function renderJogos(){
     inp.type = "radio"; inp.name = "jogo"; inp.id = "jogo-" + j.id; inp.value = j.id; inp.checked = j.id === jogo;
     inp.addEventListener("change", () => { jogo = j.id; preview(); });
     const lb = document.createElement("label"); lb.htmlFor = inp.id;
-    const m = document.createElement("span"); m.className = "mini"; m.style.background = j.base;
-    const i = document.createElement("i"); i.style.background = j.det;
-    const u = document.createElement("u"); u.style.background = j.det;
-    m.append(i, u);
+    const m = document.createElement("img"); m.className = "mini"; m.alt = ""; m.src = "img/" + j.id.toLowerCase() + "-mini.jpg";
     const b = document.createElement("b"); b.textContent = j.id;
     const t = document.createElement("span"); t.textContent = j.nome;
     lb.append(m, b, t);
@@ -251,19 +235,12 @@ renderTamanhos();
 const temNumero = () => $("comnum").checked;
 function preview(){
   const j = JOGOS.find(x => x.id === jogo);
-  $("s-body").setAttribute("fill", j.base);
-  $("s-cuff-l").setAttribute("fill", j.det);
-  $("s-cuff-r").setAttribute("fill", j.det);
-  $("s-num").setAttribute("fill", j.ink);
-  $("s-name").setAttribute("fill", j.ink);
-  $("s-name").textContent = (clean($("nome").value) || "NOME").toUpperCase();
-  $("s-num").textContent = temNumero() ? $("numero").value : "";
+  $("foto").src = "img/" + j.id.toLowerCase() + ".jpg";
+  $("foto").alt = "Camisa " + j.id + " " + j.nome + ", frente e costas";
 }
 ["semnum","comnum"].forEach(id => $(id).addEventListener("change", () => {
   $("numero").hidden = !temNumero(); if (temNumero()) $("numero").focus(); preview();
 }));
-$("nome").addEventListener("input", preview);
-$("numero").addEventListener("input", preview);
 preview();
 
 function say(el, t, err){ $(el).textContent = t; $(el).className = "msg" + (err ? " err" : ""); }
